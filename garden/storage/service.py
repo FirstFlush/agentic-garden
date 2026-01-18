@@ -29,14 +29,20 @@ class StorageService:
             self,
             sensor_type: SensorType,
             sensor_id: str,
-            since: datetime,
+            window_start: datetime,
+            window_end: datetime,
     ) -> list[RawObservationSchema]:
         try:
-            rows = RawObservation.select().where(
-                (RawObservation.sensor_type == sensor_type.value) &
-                (RawObservation.sensor_id == sensor_id) &
-                (RawObservation.created >= since)
-            ).order_by(RawObservation.created)
+            rows = (
+                RawObservation
+                .select()
+                .where(
+                    (RawObservation.sensor_type == sensor_type.value) &
+                    (RawObservation.sensor_id == sensor_id) &
+                    RawObservation.created.between(window_start, window_end)
+                )
+                .order_by(RawObservation.created)
+            )
 
             return [
                 RawObservationSchema(
@@ -85,14 +91,28 @@ class StorageService:
             self,
             sensor_type: SensorType,
             sensor_id: str,
-            since: datetime,
+            window_start: datetime,
+            window_end: datetime,
     ) -> Iterator[RawObservationSchema]:
+        """
+        Iterate over raw sensor observations within a given time window.
+
+        This is the streaming counterpart to fetch_observations(), yielding
+        RawObservationSchema objects one at a time instead of materializing
+        the full result set in memory. Intended for large result sets or
+        memory-sensitive processing.
+        """
         try:
-            query: ModelSelect = RawObservation.select().where(
-                (RawObservation.sensor_type == sensor_type.value) &
-                (RawObservation.sensor_id == sensor_id) &
-                (RawObservation.created >= since)
-            ).order_by(RawObservation.created)
+            query: ModelSelect = (
+                RawObservation
+                .select()
+                .where(
+                    (RawObservation.sensor_type == sensor_type.value) &
+                    (RawObservation.sensor_id == sensor_id) &
+                    RawObservation.created.between(window_start, window_end)
+                )
+                .order_by(RawObservation.created)
+            )
 
             for row in query.iterator():
                 yield RawObservationSchema(
