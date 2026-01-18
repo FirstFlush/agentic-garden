@@ -12,8 +12,9 @@ class ClimatePayload(SensorPayload):
 
 class LightPayload(SensorPayload):
     # read actual sesnor output
-    ...
+    raw_adc: int    
+
 
 class SoilMoisturePayload(SensorPayload):
     # read actual sensor output
-    ...
+    raw_adc: int

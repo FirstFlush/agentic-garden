@@ -1,4 +1,14 @@
 light:
+
   photoperiod:
-    on_seconds: 43200
+    on_seconds: 43200   # 12 hours
     off_seconds: 43200
+
+  adc_calibration:
+    dark: 120           # starting point, best guess
+    bright: 820         # starting point
+
+  state_detection:
+    on_threshold: 0.6
+    off_threshold: 0.4
+    min_samples: 3
