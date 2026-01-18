@@ -1,17 +1,20 @@
 climate:
   sensors:
     - id: climate_main
+      model: dht22
   window_seconds: 1800              # 30 minutes
   sampling_interval_seconds: 60
 
 soil_moisture:
   sensors:
     - id: basil_1
+      model: ek1940
   window_seconds: 14400             # 4 hours
   sampling_interval_seconds: 300    # 5 min
 
 light:
   sensors:
     - id: light_main
+      model: photo_resistor
   window_seconds: 300               # 5 minutes
   sampling_interval_seconds: null
