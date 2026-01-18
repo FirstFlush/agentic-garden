@@ -1,5 +1,5 @@
 from peewee import SqliteDatabase
-from garden.config.settings import DB_PATH
+from garden.config.constants import DB_PATH
 
 db = SqliteDatabase(
     DB_PATH,

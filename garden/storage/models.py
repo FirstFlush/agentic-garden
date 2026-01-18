@@ -14,5 +14,5 @@ class RawObservation(BaseDBModel):
     payload = TextField()
     created = DateTimeField(index=True, default=lambda: datetime.now(UTC))
 
-    class Meta(BaseDBModel.Meta):
+    class Meta:  # type: ignore[misc]
         table_name = "raw_observations"
