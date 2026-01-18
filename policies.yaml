@@ -12,3 +12,33 @@ light:
     on_threshold: 0.6
     off_threshold: 0.4
     min_samples: 3
+
+
+soil_moisture:
+  adc_calibration:
+    dry: 780            # sensor reading when soil is definitely dry
+    wet: 320            # sensor reading when soil is fully wet
+
+  state_detection:
+    dry_threshold: 0.7
+    wet_threshold: 0.3
+    min_samples: 3
+
+  drying_trend:
+    lookback_samples: 6
+    min_delta: 0.05
+
+  watering:
+    target_moisture: 0.6
+    min_interval_seconds: 21600   # 6 hours
+    max_water_per_event_ml: 30
+
+
+climate:
+  temperature:
+    min_c: 18
+    max_c: 26
+
+  humidity:
+    min_percent: 40
+    max_percent: 70
