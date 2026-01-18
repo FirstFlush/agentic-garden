@@ -2,7 +2,7 @@ from peewee import Model
 from .db import db
 
 
-class BaseDbModel(Model):
+class BaseDBModel(Model):
 
     class Meta:
         database = db

@@ -4,8 +4,9 @@ from typing import Any
 from ..hardware.enums import SensorType
 
 
-class RawObservation(BaseModel):
+class RawObservationSchema(BaseModel):
 
-    sensor: SensorType
+    sensor_id: str
+    sensor_type: SensorType
     payload: dict[str, Any]
     created: datetime
