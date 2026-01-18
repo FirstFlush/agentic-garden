@@ -1,0 +1,4 @@
+light:
+  photoperiod:
+    on_seconds: 43200
+    off_seconds: 43200
