@@ -2,12 +2,12 @@ from ..common import GardenEnum
 
 
 class SensorType(GardenEnum):
-    DHT22 = "dht22"
-    EK1940 = "ek1940"
-    PHOTO_RESISTOR = "photo_resistor"
+    CLIMATE = "climate"
+    SOIL_MOISTURE = "soil_moisture"
+    LIGHT = "light"
 
 
 class ActuatorType(GardenEnum):
     WATER_PUMP = "water_pump"
     FAN = "fan"
-    GROW_LIGHT = "grow_light"
+    LIGHT = "light"
