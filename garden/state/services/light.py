@@ -2,8 +2,8 @@ import logging
 from .base import BaseStateService
 from ..schemas import LightState
 from ...hardware.schemas import LightPayload
-from ..dto import ParsedObservation
-from ...storage.schemas import RawObservationSchema
+from ...observations.dto import ParsedObservation
+from ...observations.schemas import RawObservationSchema
 
 logger = logging.getLogger(__name__)
 

@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
 import logging
-import orjson
-from typing import Any, cast, Generic, TypeVar, Type
+from typing import Any, Generic, TypeVar, Type
 from ...hardware.schemas import SensorPayload
-from ...storage.schemas import RawObservationSchema
-from ...storage.service import StorageService
-from ..dto import ParsedObservation
+from ...observations.schemas import RawObservationSchema
+from ...observations.service import ObservationService
+from ...observations.dto import ParsedObservation
 from ..exc import StateServiceException
 from ..schemas import DerivedState
 
@@ -19,8 +18,8 @@ class BaseStateService(ABC, Generic[P, S]):
     _payload_schema: Type[P]
     _state_schema: Type[S]
 
-    def __init__(self, storage_service: StorageService):
-        self.storage_service = storage_service
+    def __init__(self, observation_service: ObservationService):
+        self.observation_service = observation_service
         try:
             self._payload_schema
             self._state_schema
@@ -69,12 +68,3 @@ class BaseStateService(ABC, Generic[P, S]):
             logger.error(msg, exc_info=True)
             raise StateServiceException(msg) from e
             
-
-
-    # def _deserialize_payload(self, payload: str) -> dict[str, Any]:
-    #     try:
-    #         return orjson.loads(payload)
-    #     except orjson.JSONDecodeError as e:
-    #         msg = f"{self.__class__.__name__} JSON deserialization failed due to the following error: {e}"
-    #         logger.error(msg, exc_info=True)
-    #         raise StateServiceException(msg) from e
