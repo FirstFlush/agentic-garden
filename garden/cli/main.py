@@ -7,8 +7,8 @@ from ..config.constants import SENSORS_CONFIG_PATH, POLICIES_CONFIG_PATH
 from ..config.logging import LOGGING
 from ..config.sensors import load_sensors_config
 from ..config.policies import load_policies_config
-from ..storage.db import db
-from ..storage.models import RawObservation
+from ..db.sqlite_db import db
+from ..observations.models import RawObservation
 from ..app_context import AppContext
 
 logger = logging.getLogger(__name__)
