@@ -1,6 +1,13 @@
 from datetime import datetime
 from pydantic import BaseModel
-from .enums import LightTrend, ClimateTrend
+from .enums import (
+    HumidityLevel,
+    HumidityTrend,
+    SoilMoistureLevel, 
+    SoilMoistureTrend,
+    TemperatureLevel,
+    TemperatureTrend
+)
 
 
 class DerivedState(BaseModel):
@@ -10,27 +17,30 @@ class DerivedState(BaseModel):
     confidence: float
 
 
-class SoilMoistureState(DerivedState):
-    avg_moisture: float
-    trend: float
+class SoilMoistureStateSchema(DerivedState):
+    avg_moisture: float              # normalized 0–1
+    level: SoilMoistureLevel
+    trend: SoilMoistureTrend
 
 
-class ClimateState(DerivedState):
+class ClimateStateSchema(DerivedState):
     temperature_c: float
     humidity_rh: float
-    vpd_kpa: float | None   # derived, optional at first
-    trend: ClimateTrend
+    vpd_kpa: float | None
+    temperature_level: TemperatureLevel
+    temperature_trend: TemperatureTrend
+    humidity_level: HumidityLevel
+    humidity_trend: HumidityTrend
 
 
-class LightState(DerivedState):
+class LightStateSchema(DerivedState):
     intensity: float
     duration_seconds: int
     is_light_on: bool
-    # trend: LightTrend     # currently not needed. Will add this if I want the system to be able to adjust lights up/down
 
 
 class DerivedStateSnapshot(BaseModel):
     created: datetime
-    soil_moisture: SoilMoistureState | None
-    climate: ClimateState | None
-    light: LightState | None
+    soil_moisture: SoilMoistureStateSchema | None
+    climate: ClimateStateSchema | None
+    light: LightStateSchema | None
