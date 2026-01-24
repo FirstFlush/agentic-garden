@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import logging
-from typing import Type
+from ...config.policies import PoliciesConfig
 from ...hardware.schemas import SensorPayload
 from ...observations.schemas import RawObservationSchema
 from ...observations.service import ObservationService
@@ -13,12 +13,8 @@ logger = logging.getLogger(__name__)
 
 class BaseStateService(ABC):
 
-    def __init__(self, observation_service: ObservationService):
-        self.observation_service = observation_service
-
-    @abstractmethod
-    def derive_state(self, observations: list[ParsedObservation]) -> DerivedStateSchema:
-        ...
+    def __init__(self, policies: PoliciesConfig):
+        self.policies = policies
 
     def parse_observations(
             self,
