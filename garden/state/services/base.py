@@ -1,70 +1,45 @@
 from abc import ABC, abstractmethod
 import logging
-from typing import Any, Generic, TypeVar, Type
+from typing import Type
 from ...hardware.schemas import SensorPayload
 from ...observations.schemas import RawObservationSchema
 from ...observations.service import ObservationService
 from ...observations.dto import ParsedObservation
 from ..exc import StateServiceException
-from ..schemas import DerivedState
+from ..schemas import DerivedStateSchema
 
 logger = logging.getLogger(__name__)
 
-P = TypeVar("P", bound=SensorPayload)
-S = TypeVar("S", bound=DerivedState)
 
-class BaseStateService(ABC, Generic[P, S]):
-
-    _payload_schema: Type[P]
-    _state_schema: Type[S]
+class BaseStateService(ABC):
 
     def __init__(self, observation_service: ObservationService):
         self.observation_service = observation_service
-        try:
-            self._payload_schema
-            self._state_schema
-        except AttributeError as e:
-            msg = f"{self.__class__.__name__} misconfigured: missing schema definition"
-            logger.error(msg, exc_info=True)
-            raise StateServiceException(msg) from e
-
-    def derive_state(self, observations: list[RawObservationSchema]) -> S:
-        """
-        DO NOT override in subclasses.
-        Override _derive_state only.
-        """
-        parsed_observations = self._parse_observations(observations)
-        try:
-            return self._derive_state(parsed_observations)
-        except StateServiceException:
-            raise 
-        except Exception as e:
-            msg = f"{self.__class__.__name__} failed to derive state due to an unexpected error: {e}"
-            logger.error(msg, exc_info=True)
-            raise StateServiceException(msg) from e
 
     @abstractmethod
-    def _derive_state(self, observations: list[ParsedObservation[P]]) -> S:
+    def derive_state(self, observations: list[ParsedObservation]) -> DerivedStateSchema:
         ...
 
-    def _parse_observations(self, observations: list[RawObservationSchema]) -> list[ParsedObservation[P]]:
-        parsed_obvs: list[ParsedObservation[P]] = []
+    def parse_observations(
+            self,
+            observations: list[RawObservationSchema],
+            payload_schema: type[SensorPayload],
+    ) -> list[ParsedObservation]:
+        parsed = []
         for obv in observations:
-            payload = self._parse_payload(obv.payload)
-            parsed_obv = ParsedObservation(
-                created=obv.created,
-                sensor_type=obv.sensor_type,
-                sensor_id=obv.sensor_id,
-                payload=payload
-            )
-            parsed_obvs.append(parsed_obv)
-        return parsed_obvs
+            try:
+                payload = payload_schema(**obv.payload)
+            except Exception as e:
+                msg = f"Invalid payload for sensor {obv.sensor_id}: {e}"
+                logger.error(msg, exc_info=True)
+                raise StateServiceException(msg) from e
 
-    def _parse_payload(self, payload: dict[str, Any]) -> P:
-        try:
-            return self._payload_schema(**payload)
-        except Exception as e:
-            msg = f"{self.__class__.__name__} payload schema validation failed due to the following error: {e}"
-            logger.error(msg, exc_info=True)
-            raise StateServiceException(msg) from e
-            
+            parsed.append(
+                ParsedObservation(
+                    created=obv.created,
+                    sensor_type=obv.sensor_type,
+                    sensor_id=obv.sensor_id,
+                    payload=payload,
+                )
+            )
+        return parsed

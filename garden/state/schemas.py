@@ -10,20 +10,20 @@ from .enums import (
 )
 
 
-class DerivedState(BaseModel):
+class DerivedStateSchema(BaseModel):
     window_start: datetime
     window_end: datetime
     sample_count: int
     confidence: float
 
 
-class SoilMoistureStateSchema(DerivedState):
+class SoilMoistureStateSchema(DerivedStateSchema):
     avg_moisture: float              # normalized 0–1
     level: SoilMoistureLevel
     trend: SoilMoistureTrend
 
 
-class ClimateStateSchema(DerivedState):
+class ClimateStateSchema(DerivedStateSchema):
     temperature_c: float
     humidity_rh: float
     vpd_kpa: float | None
@@ -33,7 +33,7 @@ class ClimateStateSchema(DerivedState):
     humidity_trend: HumidityTrend
 
 
-class LightStateSchema(DerivedState):
+class LightStateSchema(DerivedStateSchema):
     intensity: float
     duration_seconds: int
     is_light_on: bool
