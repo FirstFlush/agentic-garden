@@ -13,15 +13,15 @@ class ParsedSensorReading:
 
 
 @dataclass(frozen=True)
-class ClimateObservation(ParsedSensorReading):
+class ClimateReading(ParsedSensorReading):
     payload: ClimatePayload
 
 
 @dataclass(frozen=True)
-class LightObservation(ParsedSensorReading):
+class LightReading(ParsedSensorReading):
     payload: LightPayload
 
 
 @dataclass(frozen=True)
-class SoilMoistureObservation(ParsedSensorReading):
+class SoilMoistureReading(ParsedSensorReading):
     payload: SoilMoisturePayload

@@ -3,17 +3,17 @@ import logging
 import orjson
 from peewee import ModelSelect
 from typing import Iterator
-from .exc import ObservationServiceException
 from .models import SensorReading
 from .schemas import SensorReadingSchema
 from .enums import SensorType
+from .exc import SensorError
 
 logger = logging.getLogger(__name__)
 
 
 class SensorReadingRepository:
 
-    def save_observation(self, schema: SensorReadingSchema) -> SensorReading:
+    def save_reading(self, schema: SensorReadingSchema) -> SensorReading:
         try:
             return SensorReading.create(
                 observed_at=schema.created,
@@ -63,7 +63,7 @@ class SensorReadingRepository:
             msg = f"Failed to fetch SensorReading records due to the following error: {e}"
             self._raise_error(msg, e)
 
-    def fetch_latest(
+    def fetch_latest_reading(
             self,
             sensor_type: SensorType,
             sensor_id: str,
@@ -104,9 +104,9 @@ class SensorReadingRepository:
             window_end: datetime,
     ) -> Iterator[SensorReadingSchema]:
         """
-        Iterate over raw sensor observations within a given time window.
+        Iterate over raw sensor sensor readings within a given time window.
 
-        This is the streaming counterpart to fetch_observations(), yielding
+        This is the streaming counterpart to fetch_readings(), yielding
         SensorReadingSchema objects one at a time instead of materializing
         the full result set in memory. Intended for large result sets or
         memory-sensitive processing.
@@ -139,4 +139,4 @@ class SensorReadingRepository:
 
     def _raise_error(self, msg: str, e: Exception):
         logger.error(msg, exc_info=True)
-        raise ObservationServiceException(msg) from e
+        raise SensorError(msg) from e

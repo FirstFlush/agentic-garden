@@ -35,7 +35,7 @@ class ClimateStateSchema(DerivedStateSchema):
 
 class LightStateSchema(DerivedStateSchema):
     intensity: float
-    duration_seconds: int
+    state_started_at: datetime
     is_light_on: bool
 
 
