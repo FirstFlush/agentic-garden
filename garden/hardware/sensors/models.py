@@ -3,14 +3,14 @@ from peewee import (
     AutoField,
     TextField,
 )
-from ..db.base import BaseDBModel
+from ...db.base import BaseDBModel
 
 
-class RawObservation(BaseDBModel):
+class SensorReading(BaseDBModel):
     id = AutoField()
     sensor_type = TextField(index=True)
     sensor_id = TextField(index=True)
     payload = TextField()
 
     class Meta:  # type: ignore[misc]
-        table_name = "raw_observations"
+        table_name = "sensor_reading"

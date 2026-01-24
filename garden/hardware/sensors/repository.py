@@ -4,51 +4,51 @@ import orjson
 from peewee import ModelSelect
 from typing import Iterator
 from .exc import ObservationServiceException
-from .models import RawObservation
-from .schemas import RawObservationSchema
-from ..hardware.enums import SensorType
+from .models import SensorReading
+from .schemas import SensorReadingSchema
+from .enums import SensorType
 
 logger = logging.getLogger(__name__)
 
 
-class ObservationService:
+class SensorReadingRepository:
 
-    def save_observation(self, schema: RawObservationSchema) -> RawObservation:
+    def save_observation(self, schema: SensorReadingSchema) -> SensorReading:
         try:
-            return RawObservation.create(
+            return SensorReading.create(
                 observed_at=schema.created,
                 sensor_type=schema.sensor_type.value,
                 sensor_id=schema.sensor_id,
                 payload=orjson.dumps(schema.payload).decode("utf-8"),
             )
         except orjson.JSONEncodeError as e:
-            msg = f"Failed to serialize JSON for RawObservation record creation due to the following error: {e}"
+            msg = f"Failed to serialize JSON for SensorReading record creation due to the following error: {e}"
             self._raise_error(msg, e)
         except Exception as e:
-            msg = f"Failed to create RawObservation record due to the following error: {e}"
+            msg = f"Failed to create SensorReading record due to the following error: {e}"
             self._raise_error(msg, e)    
 
-    def fetch_observations(
+    def fetch_readings(
             self,
             sensor_type: SensorType,
             sensor_id: str,
             window_start: datetime,
             window_end: datetime,
-    ) -> list[RawObservationSchema]:
+    ) -> list[SensorReadingSchema]:
         try:
             rows = (
-                RawObservation
+                SensorReading
                 .select()
                 .where(
-                    (RawObservation.sensor_type == sensor_type.value) &
-                    (RawObservation.sensor_id == sensor_id) &
-                    RawObservation.created.between(window_start, window_end)
+                    (SensorReading.sensor_type == sensor_type.value) &
+                    (SensorReading.sensor_id == sensor_id) &
+                    SensorReading.created.between(window_start, window_end)
                 )
-                .order_by(RawObservation.created)
+                .order_by(SensorReading.created)
             )
 
             return [
-                RawObservationSchema(
+                SensorReadingSchema(
                     created=row.created,
                     sensor_type=row.sensor_type,
                     sensor_id=row.sensor_id,
@@ -57,84 +57,84 @@ class ObservationService:
                 for row in rows
             ]
         except orjson.JSONDecodeError as e:
-            msg = f"Failed to deserialize JSON for RawObservation records due to the following error: {e}"
+            msg = f"Failed to deserialize JSON for SensorReading records due to the following error: {e}"
             self._raise_error(msg, e)
         except Exception as e:
-            msg = f"Failed to fetch RawObservation records due to the following error: {e}"
+            msg = f"Failed to fetch SensorReading records due to the following error: {e}"
             self._raise_error(msg, e)
 
     def fetch_latest(
             self,
             sensor_type: SensorType,
             sensor_id: str,
-    ) -> RawObservationSchema | None:
+    ) -> SensorReadingSchema | None:
         try:
             row = (
-                RawObservation
+                SensorReading
                 .select()
                 .where(
-                    (RawObservation.sensor_type == sensor_type.value) &
-                    (RawObservation.sensor_id == sensor_id)
+                    (SensorReading.sensor_type == sensor_type.value) &
+                    (SensorReading.sensor_id == sensor_id)
                 )
-                .order_by(RawObservation.created.desc())
+                .order_by(SensorReading.created.desc())
                 .first()
             )
 
             if not row:
                 return None
 
-            return RawObservationSchema(
+            return SensorReadingSchema(
                 created=row.created,
                 sensor_type=row.sensor_type,
                 sensor_id=row.sensor_id,
                 payload=orjson.loads(row.payload),
             )
         except orjson.JSONDecodeError as e:
-            msg = f"Failed to deserialize JSON for RawObservation record due to the following error: {e}"
+            msg = f"Failed to deserialize JSON for SensorReading record due to the following error: {e}"
             self._raise_error(msg, e)
         except Exception as e:
-            msg = f"Failed to fetch latest RawObservation record due to the following error: {e}"
+            msg = f"Failed to fetch latest SensorReading record due to the following error: {e}"
             self._raise_error(msg, e)
 
-    def iter_observations(
+    def iter_readings(
             self,
             sensor_type: SensorType,
             sensor_id: str,
             window_start: datetime,
             window_end: datetime,
-    ) -> Iterator[RawObservationSchema]:
+    ) -> Iterator[SensorReadingSchema]:
         """
         Iterate over raw sensor observations within a given time window.
 
         This is the streaming counterpart to fetch_observations(), yielding
-        RawObservationSchema objects one at a time instead of materializing
+        SensorReadingSchema objects one at a time instead of materializing
         the full result set in memory. Intended for large result sets or
         memory-sensitive processing.
         """
         try:
             query: ModelSelect = (
-                RawObservation
+                SensorReading
                 .select()
                 .where(
-                    (RawObservation.sensor_type == sensor_type.value) &
-                    (RawObservation.sensor_id == sensor_id) &
-                    RawObservation.created.between(window_start, window_end)
+                    (SensorReading.sensor_type == sensor_type.value) &
+                    (SensorReading.sensor_id == sensor_id) &
+                    SensorReading.created.between(window_start, window_end)
                 )
-                .order_by(RawObservation.created)
+                .order_by(SensorReading.created)
             )
 
             for row in query.iterator():
-                yield RawObservationSchema(
+                yield SensorReadingSchema(
                     created=row.created,
                     sensor_type=row.sensor_type,
                     sensor_id=row.sensor_id,
                     payload=orjson.loads(row.payload),
                 )
         except orjson.JSONDecodeError as e:
-            msg = f"Failed to deserialize JSON for RawObservation records due to the following error: {e}"
+            msg = f"Failed to deserialize JSON for SensorReading records due to the following error: {e}"
             self._raise_error(msg, e)
         except Exception as e:
-            msg = f"Failed to iterate RawObservation records due to the following error: {e}"
+            msg = f"Failed to iterate SensorReading records due to the following error: {e}"
             self._raise_error(msg, e)
 
     def _raise_error(self, msg: str, e: Exception):

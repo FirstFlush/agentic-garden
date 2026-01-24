@@ -1,12 +1,10 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 import logging
 from ...config.policies import PoliciesConfig
-from ...hardware.schemas import SensorPayload
-from ...observations.schemas import RawObservationSchema
-from ...observations.service import ObservationService
-from ...observations.dto import ParsedObservation
+from ...hardware.sensors.schemas import SensorPayload
+from ...hardware.sensors.schemas import SensorReadingSchema
+from ...hardware.sensors.dto import ParsedSensorReading
 from ..exc import StateServiceException
-from ..schemas import DerivedStateSchema
 
 logger = logging.getLogger(__name__)
 
@@ -18,9 +16,9 @@ class BaseStateService(ABC):
 
     def parse_observations(
             self,
-            observations: list[RawObservationSchema],
+            observations: list[SensorReadingSchema],
             payload_schema: type[SensorPayload],
-    ) -> list[ParsedObservation]:
+    ) -> list[ParsedSensorReading]:
         parsed = []
         for obv in observations:
             try:
@@ -31,7 +29,7 @@ class BaseStateService(ABC):
                 raise StateServiceException(msg) from e
 
             parsed.append(
-                ParsedObservation(
+                ParsedSensorReading(
                     created=obv.created,
                     sensor_type=obv.sensor_type,
                     sensor_id=obv.sensor_id,

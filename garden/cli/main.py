@@ -8,7 +8,7 @@ from ..config.logging import LOGGING
 from ..config.sensors import load_sensors_config
 from ..config.policies import load_policies_config
 from ..db.sqlite_db import db
-from ..observations.models import RawObservation
+from ..hardware.sensors.models import SensorReading
 from ..app_context import AppContext
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ app = typer.Typer(add_completion=False)
 
 def init_db(db: SqliteDatabase):
     db.connect(reuse_if_open=True)
-    db.create_tables([RawObservation], safe=True)
+    db.create_tables([SensorReading], safe=True)
     logger.info("Established DB connection")
 
 def build_app_context(db: SqliteDatabase) -> AppContext:

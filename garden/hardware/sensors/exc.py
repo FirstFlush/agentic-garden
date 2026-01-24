@@ -1,4 +1,4 @@
-from ..common import GardenException
+from ...common import GardenException
 
 class ObservationServiceException(GardenException):
     pass

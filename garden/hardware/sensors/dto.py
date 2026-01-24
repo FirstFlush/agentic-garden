@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from datetime import datetime
-from ..hardware.schemas import LightPayload, ClimatePayload, SoilMoisturePayload, SensorPayload
-from ..hardware.enums import SensorType
+from .schemas import LightPayload, ClimatePayload, SoilMoisturePayload, SensorPayload
+from .enums import SensorType
 
 
 @dataclass(frozen=True)
-class ParsedObservation:
+class ParsedSensorReading:
     created: datetime
     sensor_type: SensorType
     sensor_id: str
@@ -13,15 +13,15 @@ class ParsedObservation:
 
 
 @dataclass(frozen=True)
-class ClimateObservation(ParsedObservation):
+class ClimateObservation(ParsedSensorReading):
     payload: ClimatePayload
 
 
 @dataclass(frozen=True)
-class LightObservation(ParsedObservation):
+class LightObservation(ParsedSensorReading):
     payload: LightPayload
 
 
 @dataclass(frozen=True)
-class SoilMoistureObservation(ParsedObservation):
+class SoilMoistureObservation(ParsedSensorReading):
     payload: SoilMoisturePayload
