@@ -2,8 +2,11 @@ from peewee import (
     AutoField,
     TextField,
     BooleanField,
+    ForeignKeyField
 )
+from playhouse.sqlite_ext import JSONField
 from garden.db.base import BaseDBModel
+from ..decision.models import DecisionLog
 
 
 class ActionLog(BaseDBModel):
@@ -14,10 +17,9 @@ class ActionLog(BaseDBModel):
     id = AutoField()
     action_type = TextField(index=True)
     actuator_id = TextField(index=True)
-    action_params = TextField(null=True)        # JSON
+    action_params = JSONField(null=True)
     requested_by = TextField()
-    # decision_facts = TextField(null=True)     # JSON
-    state_snapshot = TextField(null=True)       # JSON 
+    decision = ForeignKeyField(DecisionLog, backref="decisions", on_delete="CASCADE")
     approved = BooleanField(default=False)
     executed = BooleanField(default=False)
 
