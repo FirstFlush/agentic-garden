@@ -1,0 +1,46 @@
+climate:
+
+  sensors:
+    - id: climate_main
+      model: dht22
+      
+  sampling:
+    interval_seconds: 60
+
+  evaluation:
+    interval_seconds: 300     # derive state every 5 min
+
+  evidence:
+    lookback_seconds: 1800    # use last 30 min of data
+
+
+soil_moisture:
+
+  sensors:
+    - id: basil_1
+      model: ek1940
+
+  sampling:
+    interval_seconds: 300
+
+  evaluation:
+    interval_seconds: 900     # every 15 min
+
+  evidence:
+    lookback_seconds: 14400   # 4 hours
+
+
+light:
+
+  sensors:
+    - id: light_main
+      model: photo_resistor
+
+  sampling:
+    interval_seconds: 300     # read sensor every 5 min
+
+  evaluation:
+    interval_seconds: 300     # derive state every read
+
+  evidence:
+    lookback_samples: 3       # require 3 consecutive reads
