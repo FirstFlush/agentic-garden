@@ -9,15 +9,23 @@ from ..config.sensors import load_sensors_config
 from ..config.policies import load_policies_config
 from ..db.sqlite_db import db
 from ..hardware.sensors.models import SensorReading
+from ..action.models import ActionLog
+from ..decision.models import DecisionLog
+from ..state.models import ClimateState, LightState, SoilMoistureState
 from ..app_context import AppContext
 
 logger = logging.getLogger(__name__)
 app = typer.Typer(add_completion=False)
 
+tables = [
+    ActionLog, DecisionLog, SensorReading,
+    ClimateState, LightState, SoilMoistureState,
+]
+
 
 def init_db(db: SqliteDatabase):
     db.connect(reuse_if_open=True)
-    db.create_tables([SensorReading], safe=True)
+    db.create_tables(tables, safe=True)
     logger.info("Established DB connection")
 
 def build_app_context(db: SqliteDatabase) -> AppContext:
