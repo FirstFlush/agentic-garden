@@ -1,3 +1,6 @@
+
+policy_version: "2026-01-31-a"
+
 light:
 
   calibration:
@@ -26,8 +29,8 @@ soil_moisture:
 
   interpretation:
     level:
-      dry_threshold: 0.7
-      wet_threshold: 0.3
+      dry_threshold: 0.3
+      wet_threshold: 0.7
       min_samples: 3
 
     trend:

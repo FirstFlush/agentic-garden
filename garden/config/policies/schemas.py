@@ -160,3 +160,4 @@ class PoliciesConfig(BaseModel):
     light: LightPolicy
     climate: ClimatePolicy
     soil_moisture: SoilMoisturePolicy
+    policy_version: str
