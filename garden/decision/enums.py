@@ -9,5 +9,4 @@ class DecisionOutcome(GardenEnum):
 
 class EscalationTarget(GardenEnum):
     LLM = "llm"
-    RULESET = "ruleset"
-    MANUAL = "manual"
+    ALERT = "alert"
