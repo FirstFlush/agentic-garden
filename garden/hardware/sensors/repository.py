@@ -1,14 +1,10 @@
 from datetime import datetime
-import logging
-import orjson
 from peewee import ModelSelect
 from typing import Iterator
 from .models import SensorReading
 from .schemas import SensorReadingSchema
 from .enums import SensorType
-from .exc import SensorError
-
-logger = logging.getLogger(__name__)
+from ...common.exc import RepositoryError
 
 
 class SensorReadingRepository:
@@ -16,17 +12,14 @@ class SensorReadingRepository:
     def save_reading(self, schema: SensorReadingSchema) -> SensorReading:
         try:
             return SensorReading.create(
-                observed_at=schema.created,
+                created=schema.created,
                 sensor_type=schema.sensor_type.value,
                 sensor_id=schema.sensor_id,
-                payload=orjson.dumps(schema.payload).decode("utf-8"),
+                payload=schema.payload,
             )
-        except orjson.JSONEncodeError as e:
-            msg = f"Failed to serialize JSON for SensorReading record creation due to the following error: {e}"
-            self._raise_error(msg, e)
         except Exception as e:
             msg = f"Failed to create SensorReading record due to the following error: {e}"
-            self._raise_error(msg, e)    
+            raise RepositoryError(msg) from e    
 
     def fetch_readings(
             self,
@@ -52,16 +45,13 @@ class SensorReadingRepository:
                     created=row.created,
                     sensor_type=row.sensor_type,
                     sensor_id=row.sensor_id,
-                    payload=orjson.loads(row.payload),
+                    payload=row.payload,
                 )
                 for row in rows
             ]
-        except orjson.JSONDecodeError as e:
-            msg = f"Failed to deserialize JSON for SensorReading records due to the following error: {e}"
-            self._raise_error(msg, e)
         except Exception as e:
             msg = f"Failed to fetch SensorReading records due to the following error: {e}"
-            self._raise_error(msg, e)
+            raise RepositoryError(msg) from e
 
     def fetch_latest_reading(
             self,
@@ -87,14 +77,11 @@ class SensorReadingRepository:
                 created=row.created,
                 sensor_type=row.sensor_type,
                 sensor_id=row.sensor_id,
-                payload=orjson.loads(row.payload),
+                payload=row.payload,
             )
-        except orjson.JSONDecodeError as e:
-            msg = f"Failed to deserialize JSON for SensorReading record due to the following error: {e}"
-            self._raise_error(msg, e)
         except Exception as e:
             msg = f"Failed to fetch latest SensorReading record due to the following error: {e}"
-            self._raise_error(msg, e)
+            raise RepositoryError(msg) from e
 
     def iter_readings(
             self,
@@ -128,15 +115,8 @@ class SensorReadingRepository:
                     created=row.created,
                     sensor_type=row.sensor_type,
                     sensor_id=row.sensor_id,
-                    payload=orjson.loads(row.payload),
+                    payload=row.payload,
                 )
-        except orjson.JSONDecodeError as e:
-            msg = f"Failed to deserialize JSON for SensorReading records due to the following error: {e}"
-            self._raise_error(msg, e)
         except Exception as e:
             msg = f"Failed to iterate SensorReading records due to the following error: {e}"
-            self._raise_error(msg, e)
-
-    def _raise_error(self, msg: str, e: Exception):
-        logger.error(msg, exc_info=True)
-        raise SensorError(msg) from e
+            raise RepositoryError(msg) from e
